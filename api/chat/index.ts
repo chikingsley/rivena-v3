@@ -35,6 +35,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Check if OpenAI API key is set
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('Missing OPENAI_API_KEY environment variable')
+      return res.status(500).json({ error: 'Server configuration error: Missing API key' })
+    }
+
     const { messages, id = generateId() } = req.body
 
     // Use shared handler to process the chat request
@@ -63,6 +69,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   } catch (error) {
     console.error('Chat error:', error)
-    res.status(500).json({ error: 'An error occurred while processing your request' })
+    // More detailed error response
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+    const errorStack = error instanceof Error ? error.stack : ''
+    res.status(500).json({ 
+      error: 'An error occurred while processing your request',
+      message: errorMessage,
+      stack: process.env.NODE_ENV === 'development' ? errorStack : undefined
+    })
   }
 } 
