@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { generateId } from 'ai'
-import { handleChatRequest } from '../../src/lib/handler'
+import { handleChatRequest } from '../../src/lib/handler.js'
 import { Readable } from 'stream'
 
 // Helper function to convert a web ReadableStream to a Node.js stream
