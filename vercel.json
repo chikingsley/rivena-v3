@@ -3,10 +3,7 @@
     "api/**/*": {
       "memory": 1024,
       "maxDuration": 60,
-      "includeFiles": [
-        "../src/lib/handler.ts",
-        "../src/lib/tools/chat-store.ts"
-      ]
+      "includeFiles": "src/lib/**/*"
     }
   }
 }
