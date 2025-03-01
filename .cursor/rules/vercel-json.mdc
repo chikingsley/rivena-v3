@@ -1,0 +1,197 @@
+---
+description: Guidelines for writing vercel.json files
+globs: vercel.json
+alwaysApply: false
+---
+---
+description: Guidelines for writing vercel.json files
+globs: "vercel.json"
+alwaysApply: false
+---
+# Vercel.json Configuration Guidelines
+
+This file provides a set of rules and best practices for creating and maintaining your vercel.json configuration file. Follow these guidelines to ensure your configuration is secure, up-to-date, and easy to maintain.
+
+## Overview
+
+Your vercel.json file is used to configure how Vercel deploys your project. Use the modern properties below and avoid deprecated settings for improved clarity and security.
+
+---
+
+## Supported Configuration Properties
+
+- **buildCommand**  
+  *Type:* string | null  
+  *Purpose:* Overrides the default build command defined in your project settings.
+
+- **cleanUrls**  
+  *Type:* boolean (default: false)  
+  *Purpose:* Removes file extensions from URLs (e.g., serving `/about` instead of `/about.html`).
+
+- **crons**  
+  *Type:* array of cron objects  
+  *Purpose:* Schedule API invocations via cron jobs.
+
+- **devCommand**  
+  *Type:* string | null  
+  *Purpose:* Overrides the development command when running locally or in preview mode.
+
+- **framework**  
+  *Type:* string | null  
+  *Purpose:* Specifies the framework preset (e.g., `nextjs`, `nuxtjs`, `svelte`, etc.).
+
+- **functions**  
+  *Type:* object  
+  *Purpose:* Customize Serverless Functions (e.g., memory, maxDuration).
+
+- **headers**  
+  *Type:* array of header objects  
+  *Purpose:* Set custom HTTP response headers for security and caching.
+
+- **ignoreCommand**  
+  *Type:* string | null  
+  *Purpose:* Overrides the command used to ignore a build step.
+
+- **installCommand**  
+  *Type:* string | null  
+  *Purpose:* Overrides the default installation command.
+
+- **images**  
+  *Type:* object  
+  *Purpose:* Configure Vercel’s Image Optimization API settings.
+
+- **outputDirectory**  
+  *Type:* string | null  
+  *Purpose:* Specifies a custom output directory for your build.
+
+- **public**  
+  *Type:* boolean (default: false)  
+  *Purpose:* Makes the source view and logs publicly accessible.
+
+- **redirects**  
+  *Type:* array of redirect objects  
+  *Purpose:* Define URL redirects with optional permanent flags or status codes.
+
+- **regions**  
+  *Type:* array of strings  
+  *Purpose:* Specifies the primary regions for your Serverless Functions.
+
+- **functionFailoverRegions**  
+  *Type:* array of strings  
+  *Purpose:* Provides fallback regions if primary regions are unavailable.
+
+- **rewrites**  
+  *Type:* array of rewrite objects  
+  *Purpose:* Proxy requests to different destinations without changing the URL.
+
+- **trailingSlash**  
+  *Type:* boolean  
+  *Purpose:* Controls whether URLs should include a trailing slash.
+
+---
+
+## Deprecated / Legacy Properties
+
+Avoid using these properties as they are maintained only for backward compatibility:
+
+- **name**  
+  Use Project Linking instead.
+
+- **version**  
+  Deprecated in favor of the default Vercel Platform version.
+
+- **alias**  
+  Define custom domains in Project Settings.
+
+- **scope**  
+  Use Project Linking for team configurations.
+
+- **env** and **build.env**  
+  Set environment variables via Project Settings instead.
+
+- **builds**  
+  Use the `functions` property for Serverless Functions.
+
+- **routes**  
+  Prefer using `cleanUrls`, `redirects`, `rewrites`, and `headers`.
+
+---
+
+## Best Practices
+
+1. **Prefer Supported Properties:**  
+   Use modern configuration options (e.g., `functions`, `rewrites`, and `redirects`) to maintain clarity and compatibility.
+
+2. **Avoid Legacy Settings:**  
+   Transition away from deprecated properties to reduce complexity and prevent unexpected behavior.
+
+3. **Test Your Configuration:**  
+   Verify functionality both locally (with `vercel dev`) and in production—note that some features (e.g., conditional routing with `has`) may behave differently in local development.
+
+4. **Focus on Security:**  
+   Use headers (like `X-Content-Type-Options`, `X-Frame-Options`, and `X-XSS-Protection`) to protect your application.
+
+---
+
+## Example vercel.json Configuration
+
+```json
+{
+  "buildCommand": "next build",
+  "cleanUrls": true,
+  "crons": [
+    { "path": "/api/every-minute", "schedule": "* * * * *" },
+    { "path": "/api/every-hour", "schedule": "0 * * * *" },
+    { "path": "/api/every-day", "schedule": "0 0 * * *" }
+  ],
+  "devCommand": "next dev",
+  "framework": "nextjs",
+  "functions": {
+    "api/test.js": {
+      "memory": 3009,
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]
+    }
+  ],
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD ./",
+  "installCommand": "npm install",
+  "images": {
+    "sizes": [256, 640, 1080, 2048, 3840],
+    "localPatterns": [{ "pathname": "^/assets/.*$", "search": "" }],
+    "remotePatterns": [
+      {
+        "protocol": "https",
+        "hostname": "example.com",
+        "port": "",
+        "pathname": "^/account123/.*$",
+        "search": "?v=1"
+      }
+    ],
+    "minimumCacheTTL": 60,
+    "qualities": [25, 50, 75],
+    "formats": ["image/webp"],
+    "dangerouslyAllowSVG": false,
+    "contentSecurityPolicy": "script-src 'none'; frame-src 'none'; sandbox;",
+    "contentDispositionType": "inline"
+  },
+  "outputDirectory": "build",
+  "public": true,
+  "redirects": [
+    { "source": "/me", "destination": "/profile.html", "permanent": false }
+  ],
+  "regions": ["sfo1"],
+  "functionFailoverRegions": ["iad1", "sfo1"],
+  "rewrites": [
+    { "source": "/blog/:id", "destination": "/api/blog" }
+  ],
+  "trailingSlash": false
+}

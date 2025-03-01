@@ -143,38 +143,38 @@ const memoryCategories = {
 
 const MemoryActions = () => {
   return (
-    <div className="absolute right-0 top-1 opacity-0 group-hover:opacity-100 transition-opacity">
-      <div className="flex gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground hover:text-foreground"
-          title="Edit memory"
-        >
-          <PenLine className="h-3 w-3" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground hover:text-foreground"
-          title="View related conversations"
-        >
-          <MessageSquare className="h-3 w-3" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6 text-muted-foreground hover:text-destructive"
-          title="Remove memory"
-        >
-          <AlertCircle className="h-3 w-3" />
-        </Button>
-      </div>
+    <div className="flex gap-1 transition-opacity">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+        title="Edit memory"
+      >
+        <PenLine className="h-3 w-3" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 text-muted-foreground hover:text-foreground"
+        title="View related conversations"
+      >
+        <MessageSquare className="h-3 w-3" />
+      </Button>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6 text-muted-foreground hover:text-destructive"
+        title="Remove memory"
+      >
+        <AlertCircle className="h-3 w-3" />
+      </Button>
     </div>
   )
 }
 
 const MemoryItem = ({ memory }: { memory: Memory }) => {
+  const [showActions, setShowActions] = useState(false)
+  
   const getMemoryIcon = () => {
     switch (memory.type) {
       case "fact":
@@ -193,19 +193,32 @@ const MemoryItem = ({ memory }: { memory: Memory }) => {
   }
 
   return (
-    <div className="py-2 pl-4 pr-2 mb-2 hover:bg-gray-100 rounded-lg cursor-pointer group relative">
-      <div className="flex items-start gap-2">
-        <div className="mt-0.5">{getMemoryIcon()}</div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm text-gray-800">{memory.content}</p>
-          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>Learned {format(memory.learnedAt, "MMM d")}</span>
-            <span className="text-xs bg-gray-200 rounded-full px-1.5 ml-1">{Math.round(memory.confidence * 100)}%</span>
-          </p>
+    <div 
+      className="py-3 px-4 mb-1.5 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
+      onMouseEnter={() => setShowActions(true)}
+      onMouseLeave={() => setShowActions(false)}
+    >
+      <div className="flex items-start gap-3 justify-between">
+        <div className="flex items-start gap-3 flex-grow min-w-0">
+          <div className="mt-0.5 flex-shrink-0">{getMemoryIcon()}</div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm text-gray-800 leading-snug">{memory.content}</p>
+            <p className="text-xs text-gray-500 mt-1.5 flex items-center gap-1.5">
+              <Clock className="h-3 w-3" />
+              <span>Learned {format(memory.learnedAt, "MMM d")}</span>
+              <span className="text-xs bg-gray-200 rounded-full px-1.5 py-0.5">
+                {Math.round(memory.confidence * 100)}%
+              </span>
+            </p>
+          </div>
         </div>
+        
+        {showActions && (
+          <div className="flex-shrink-0 ml-2">
+            <MemoryActions />
+          </div>
+        )}
       </div>
-      <MemoryActions />
     </div>
   )
 }
@@ -227,56 +240,57 @@ export function MemoriesContent() {
   }
 
   return (
-    <div className="h-full">
-      <div className="flex justify-between items-center px-3 py-2">
-        <div className="text-sm font-medium text-muted-foreground">What I Know About You</div>
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-white flex-shrink-0">
+        <div className="text-sm font-medium">What I Know About You</div>
         <div className="flex gap-1">
-          <Button variant="ghost" size="sm" className="h-7 px-2">
+          <Button variant="ghost" size="sm" className="h-7 px-2 hover:bg-gray-100">
             <BarChart3 className="h-3.5 w-3.5" />
           </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2">
+          <Button variant="ghost" size="sm" className="h-7 px-2 hover:bg-gray-100">
             <Sparkles className="h-3.5 w-3.5" />
           </Button>
         </div>
       </div>
 
-      {Object.entries(memoryCategories).map(([key, category]) => {
-        // Cast the key to the appropriate type
-        const sectionKey = key as 'facts' | 'preferences' | 'goals' | 'insights' | 'achievements';
-        
-        return (
-          <div key={key} className="mb-2">
-            <div
-              className="px-3 py-2 bg-gray-50 border-y border-gray-200 cursor-pointer hover:bg-gray-100"
-              onClick={() => toggleSection(sectionKey)}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <category.icon className="h-4 w-4 text-gray-500 mr-2" />
-                  <span className="font-medium text-gray-800">{category.label}</span>
-                  <span className="ml-1.5 text-xs bg-gray-200 text-gray-700 px-1.5 rounded-full">
-                    {category.items.length}
-                  </span>
+      <div className="overflow-y-auto flex-grow">
+        {Object.entries(memoryCategories).map(([key, category]) => {
+          // Cast the key to the appropriate type
+          const sectionKey = key as 'facts' | 'preferences' | 'goals' | 'insights' | 'achievements';
+          
+          return (
+            <div key={key} className="mb-1 last:mb-0">
+              <div
+                className="px-4 py-2.5 bg-gray-50 border-b border-gray-200 cursor-pointer hover:bg-gray-100 transition-colors"
+                onClick={() => toggleSection(sectionKey)}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center">
+                    <category.icon className="h-4 w-4 text-gray-500 mr-2.5" />
+                    <span className="font-medium text-gray-800">{category.label}</span>
+                    <span className="ml-2 text-xs bg-gray-200 text-gray-700 px-1.5 py-0.5 rounded-full">
+                      {category.items.length}
+                    </span>
+                  </div>
+                  <ChevronDown
+                    className={`h-4 w-4 text-gray-500 transition-transform ${
+                      expandedSections[sectionKey] ? "transform rotate-180" : ""
+                    }`}
+                  />
                 </div>
-                <ChevronDown
-                  className={`h-4 w-4 text-gray-500 transition-transform ${
-                    expandedSections[sectionKey] ? "transform rotate-180" : ""
-                  }`}
-                />
               </div>
-            </div>
 
-            {expandedSections[sectionKey] && (
-              <div className="px-2">
-                {category.items.map((memory) => (
-                  <MemoryItem key={memory.id} memory={memory as Memory} />
-                ))}
-              </div>
-            )}
-          </div>
-        );
-      })}
+              {expandedSections[sectionKey] && (
+                <div className="py-1">
+                  {category.items.map((memory) => (
+                    <MemoryItem key={memory.id} memory={memory as Memory} />
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   )
 }
-

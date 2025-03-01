@@ -8,7 +8,7 @@ export default function ChatLayout() {
     <SidebarProvider>
       <div className="flex h-screen w-full overflow-hidden">
         <AppSidebar />
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-hidden">
           <Outlet />
         </main>
       </div>

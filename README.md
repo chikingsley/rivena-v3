@@ -1,54 +1,76 @@
-# React + TypeScript + Vite
+# Rivena V3
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern AI chat application built with React, Vite, and Elysia.
 
-Currently, two official plugins are available:
+## Local Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
 
-## Expanding the ESLint configuration
+- [Bun](https://bun.sh/) - Fast JavaScript runtime and package manager
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Setup
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+1. Install dependencies:
+
+```bash
+bun install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Run the development server:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+```bash
+# This will start both the Vite frontend and Elysia API server
+bun run start
 ```
+
+Alternatively, you can run them separately:
+
+```bash
+# Frontend only (Vite)
+bun run dev
+
+# API server only (Elysia)
+bun run api
+```
+
+## How It Works
+
+The application consists of three main parts:
+
+1. **Frontend**: React application built with Vite
+2. **Backend API**: Elysia server providing the chat API for local development
+3. **Serverless Functions**: TypeScript functions for production deployment on Vercel
+4. **Shared Handlers**: Core business logic shared between local and production environments
+
+In development, the Vite dev server proxies `/api` requests to the Elysia server running on port 3000.
+
+## Shared Architecture
+
+This project uses a shared handler architecture to avoid code duplication:
+
+- `/lib/chat/handler.ts` - Core chat handling logic used by both environments
+- `/api/index.ts` - Elysia server for local development that imports the shared handler
+- `/api/chat/index.ts` - Vercel serverless function that imports the same shared handler
+
+This ensures that your chat functionality works consistently across environments.
+
+## Deployment to Vercel
+
+This project is configured to work seamlessly on Vercel with no code changes needed between development and production.
+
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Deploy
+
+In production, Vercel will use the TypeScript serverless functions in the `/api` directory.
+
+## Project Structure
+
+- `/src` - Frontend React application
+- `/api` - Backend API server (Elysia) and Vercel serverless functions
+- `/lib` - Shared utilities and business logic
+  - `/lib/chat` - Shared chat handling logic
+
+## Environment Variables
+
+No environment variables are required for basic functionality. The API server will use port 3000 by default, but you can change it by setting the `PORT` environment variable.

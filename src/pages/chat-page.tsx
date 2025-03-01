@@ -1,23 +1,17 @@
-'use client';
+'use client'
 
-import { useChat } from '@ai-sdk/react';
+import { Message } from 'ai'
+import { Chat } from '@/components/chat'
 
-export default function Page() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat({});
+interface ChatPageProps {
+  id?: string;
+  initialMessages?: Message[];
+}
 
+export default function ChatPage({ id, initialMessages = [] }: ChatPageProps) {
   return (
-    <>
-      {messages.map(message => (
-        <div key={message.id}>
-          {message.role === 'user' ? 'User: ' : 'AI: '}
-          {message.content}
-        </div>
-      ))}
-
-      <form onSubmit={handleSubmit}>
-        <input name="prompt" value={input} onChange={handleInputChange} />
-        <button type="submit">Submit</button>
-      </form>
-    </>
+    <div className="h-full flex flex-col">
+      <Chat id={id} initialMessages={initialMessages} />
+    </div>
   );
 }
