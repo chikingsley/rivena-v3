@@ -2,7 +2,7 @@
 import { Elysia } from 'elysia'
 import { Message } from 'ai'
 import chatApiRoutes from './chat'
-import { handleChatRequest } from '../lib/chat/handler'
+import { handleChatRequest } from './handler'
 
 // Get port from environment variable or use 3000 as default
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
