@@ -7,8 +7,14 @@
     "strict": true,
     "outDir": "dist",
     "declaration": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": "..",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/api/*": ["api/*"],
+      "@/lib/*": ["src/lib/*"]
+    }
   },
-  "include": ["./**/*.ts", "../lib/**/*.ts"],
+  "include": ["./**/*.ts", "../src/**/*.ts"],
   "exclude": ["node_modules"]
 } 

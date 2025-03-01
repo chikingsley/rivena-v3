@@ -1,5 +1,5 @@
 import { Elysia } from 'elysia'
-import { createChat, loadChat } from '../tools/chat-store'
+import { createChat, loadChat } from '@/lib/tools/chat-store'
 
 export const chatApiRoutes = new Elysia({ prefix: '/api' })
   .post('/create-chat', async () => {
