@@ -240,37 +240,42 @@ export function MemoriesContent() {
         </div>
       </div>
 
-      {Object.entries(memoryCategories).map(([key, category]) => (
-        <div key={key} className="mb-2">
-          <div
-            className="px-3 py-2 bg-gray-50 border-y border-gray-200 cursor-pointer hover:bg-gray-100"
-            onClick={() => toggleSection(key)}
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <category.icon className="h-4 w-4 text-gray-500 mr-2" />
-                <span className="font-medium text-gray-800">{category.label}</span>
-                <span className="ml-1.5 text-xs bg-gray-200 text-gray-700 px-1.5 rounded-full">
-                  {category.items.length}
-                </span>
+      {Object.entries(memoryCategories).map(([key, category]) => {
+        // Cast the key to the appropriate type
+        const sectionKey = key as 'facts' | 'preferences' | 'goals' | 'insights' | 'achievements';
+        
+        return (
+          <div key={key} className="mb-2">
+            <div
+              className="px-3 py-2 bg-gray-50 border-y border-gray-200 cursor-pointer hover:bg-gray-100"
+              onClick={() => toggleSection(sectionKey)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <category.icon className="h-4 w-4 text-gray-500 mr-2" />
+                  <span className="font-medium text-gray-800">{category.label}</span>
+                  <span className="ml-1.5 text-xs bg-gray-200 text-gray-700 px-1.5 rounded-full">
+                    {category.items.length}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`h-4 w-4 text-gray-500 transition-transform ${
+                    expandedSections[sectionKey] ? "transform rotate-180" : ""
+                  }`}
+                />
               </div>
-              <ChevronDown
-                className={`h-4 w-4 text-gray-500 transition-transform ${
-                  expandedSections[key] ? "transform rotate-180" : ""
-                }`}
-              />
             </div>
-          </div>
 
-          {expandedSections[key] && (
-            <div className="px-2">
-              {category.items.map((memory) => (
-                <MemoryItem key={memory.id} memory={memory as Memory} />
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+            {expandedSections[sectionKey] && (
+              <div className="px-2">
+                {category.items.map((memory) => (
+                  <MemoryItem key={memory.id} memory={memory as Memory} />
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   )
 }

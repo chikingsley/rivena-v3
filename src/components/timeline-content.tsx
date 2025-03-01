@@ -90,77 +90,81 @@ export function TimelineContent() {
         </button>
       </div>
 
-      {timelineSections.map((section) => (
-        <div key={section.id} className="mb-4">
-          <div
-            className="px-3 py-2 bg-gray-100 border-y border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-200"
-            onClick={() => toggleSection(section.id)}
-          >
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 text-gray-600" />
-              <span className="text-sm font-medium">{section.title}</span>
+      {timelineSections.map((section) => {
+        const sectionId = section.id as 'today' | 'yesterday' | 'thisWeek';
+        
+        return (
+          <div key={section.id} className="mb-4">
+            <div
+              className="px-3 py-2 bg-gray-100 border-y border-gray-200 flex justify-between items-center cursor-pointer hover:bg-gray-200"
+              onClick={() => toggleSection(sectionId)}
+            >
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-gray-600" />
+                <span className="text-sm font-medium">{section.title}</span>
+              </div>
+              <ChevronDown
+                className={`h-4 w-4 text-gray-600 transition-transform ${
+                  expandedSections[sectionId] ? "rotate-180" : ""
+                }`}
+              />
             </div>
-            <ChevronDown
-              className={`h-4 w-4 text-gray-600 transition-transform ${
-                expandedSections[section.id] ? "rotate-180" : ""
-              }`}
-            />
-          </div>
 
-          {expandedSections[section.id] && (
-            <div className="space-y-1 py-2">
-              {section.conversations.map((conv, idx) => (
-                <div
-                  key={`${section.id}-${idx}`}
-                  className="px-3 py-2 mx-2 rounded-lg border-l-4 border-purple-500 bg-white hover:bg-gray-50 cursor-pointer"
-                >
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-1.5">
-                      {conv.type === "voice" && <Phone className="h-3.5 w-3.5 text-blue-600" />}
-                      {conv.type === "summary" && <Sparkles className="h-3.5 w-3.5 text-amber-600" />}
-                      {conv.type === "chat" && <MessageSquare className="h-3.5 w-3.5 text-purple-600" />}
-                      <span className="font-medium text-sm">{conv.title}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">{conv.time}</span>
-                  </div>
-
-                  <p className="text-xs text-gray-600 line-clamp-2">{conv.description}</p>
-
-                  {conv.type === "voice" && (
-                    <div className="mt-1.5 flex items-center text-xs gap-2">
-                      <button className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Volume className="h-3 w-3" />
-                        <span>Play</span>
-                      </button>
-                      <button className="bg-gray-50 text-gray-600 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <BookOpen className="h-3 w-3" />
-                        <span>Transcript</span>
-                      </button>
-                    </div>
-                  )}
-
-                  {conv.tags && (
-                    <div className="flex items-center mt-1.5 gap-2">
-                      <div className="flex -space-x-2">
-                        {conv.tags.map((tag, i) => (
-                          <div
-                            key={tag}
-                            className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold
-                              ${i === 0 ? "bg-green-200 text-green-700" : "bg-blue-200 text-blue-700"}`}
-                          >
-                            {tag[0]}
-                          </div>
-                        ))}
+            {expandedSections[sectionId] && (
+              <div className="space-y-1 py-2">
+                {section.conversations.map((conv, idx) => (
+                  <div
+                    key={`${section.id}-${idx}`}
+                    className="px-3 py-2 mx-2 rounded-lg border-l-4 border-purple-500 bg-white hover:bg-gray-50 cursor-pointer"
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <div className="flex items-center gap-1.5">
+                        {conv.type === "voice" && <Phone className="h-3.5 w-3.5 text-blue-600" />}
+                        {conv.type === "summary" && <Sparkles className="h-3.5 w-3.5 text-amber-600" />}
+                        {conv.type === "chat" && <MessageSquare className="h-3.5 w-3.5 text-purple-600" />}
+                        <span className="font-medium text-sm">{conv.title}</span>
                       </div>
-                      <span className="text-[10px] text-gray-500">{conv.tags.join(", ")}</span>
+                      <span className="text-xs text-gray-500">{conv.time}</span>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      ))}
+
+                    <p className="text-xs text-gray-600 line-clamp-2">{conv.description}</p>
+
+                    {conv.type === "voice" && (
+                      <div className="mt-1.5 flex items-center text-xs gap-2">
+                        <button className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <Volume className="h-3 w-3" />
+                          <span>Play</span>
+                        </button>
+                        <button className="bg-gray-50 text-gray-600 px-2 py-0.5 rounded-full flex items-center gap-1">
+                          <BookOpen className="h-3 w-3" />
+                          <span>Transcript</span>
+                        </button>
+                      </div>
+                    )}
+
+                    {conv.tags && (
+                      <div className="flex items-center mt-1.5 gap-2">
+                        <div className="flex -space-x-2">
+                          {conv.tags.map((tag, i) => (
+                            <div
+                              key={tag}
+                              className={`w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold
+                                ${i === 0 ? "bg-green-200 text-green-700" : "bg-blue-200 text-blue-700"}`}
+                            >
+                              {tag[0]}
+                            </div>
+                          ))}
+                        </div>
+                        <span className="text-[10px] text-gray-500">{conv.tags.join(", ")}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      })}
     </div>
   )
 }
