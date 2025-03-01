@@ -1,31 +1,29 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { generateId } from 'ai'
 import { handleChatRequest } from '../../src/lib/handler.js'
-import { Readable } from 'stream'
 
-// Helper function to convert a web ReadableStream to a Node.js stream
-function webStreamToNodeStream(webStream: ReadableStream): Readable {
-  const nodeStream = new Readable({
-    read() {}
-  });
-
-  const reader = webStream.getReader();
+// Helper to pipe a Web ReadableStream to a Node.js readable stream
+function pipeWebStreamToResponse(webStream: ReadableStream, res: VercelResponse) {
+  const reader = webStream.getReader()
   
-  function push() {
+  function pump() {
     reader.read().then(({ done, value }) => {
       if (done) {
-        nodeStream.push(null);
-        return;
+        res.end()
+        return
       }
-      nodeStream.push(Buffer.from(value));
-      push();
-    }).catch(err => {
-      nodeStream.destroy(err);
-    });
+      
+      // Write chunk to response
+      res.write(value)
+      
+      // Continue reading
+      pump()
+    }).catch(error => {
+      console.error('Error reading stream:', error)
+      res.end()
+    })
   }
   
-  push();
-  return nodeStream;
+  pump()
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -35,22 +33,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Log import path to help debug path resolution issues
-    console.log('Handling chat request in dedicated serverless function');
+    console.log('Processing chat request in serverless function')
     
-    const { messages, id = generateId() } = req.body
+    // Extract the messages and ID from the request body
+    const { messages, id } = req.body
     
-    console.log(`Processing chat request with ${messages.length} messages`);
-
-    // Use shared handler to process the chat request
+    if (!messages || !id) {
+      return res.status(400).json({ error: 'Messages and ID are required' })
+    }
+    
+    // Process the chat request using shared handler
     const result = await handleChatRequest({ messages, id })
     
-    console.log('Chat request processed successfully');
-    
-    // Convert the result to a response
+    // Convert the result to a streaming response
     const response = await result.toDataStreamResponse()
     
-    // Copy headers from the response to our response
+    // Copy headers from the response
     for (const [key, value] of response.headers.entries()) {
       res.setHeader(key, value)
     }
@@ -58,31 +56,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Set the status code
     res.status(response.status)
     
-    // Stream the response body
-    const body = await response.body
-    
-    if (body) {
-      // Convert Web ReadableStream to Node.js stream
-      const nodeReadable = webStreamToNodeStream(body);
-      nodeReadable.pipe(res);
+    // Stream the response body if present
+    if (response.body) {
+      pipeWebStreamToResponse(response.body, res)
     } else {
       res.end()
     }
   } catch (error) {
-    console.error('Chat error:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-    
-    // If it's a module resolution error, provide more details
-    if (error instanceof Error && error.message.includes('Cannot find module')) {
-      console.error('Module resolution error - this usually indicates a path alias issue');
-    }
-    
-    // More detailed error response
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    
+    console.error('Error processing chat request:', error)
     res.status(500).json({ 
-      error: 'An error occurred while processing your request',
-      message: errorMessage
-    });
+      error: 'Internal server error',
+      message: error instanceof Error ? error.message : 'Unknown error'
+    })
   }
 } 
