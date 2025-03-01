@@ -1,8 +1,8 @@
 // src/api/index.ts
 import { Elysia } from 'elysia'
 import { Message } from 'ai'
-import chatApiRoutes from '@/api/chat'
-import { handleChatRequest } from '@/lib/handler'
+import chatApiRoutes from './chat'
+import { handleChatRequest } from '../src/lib/handler'
 
 // Get port from environment variable or use 3000 as default
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
