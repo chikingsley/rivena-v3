@@ -1,5 +1,4 @@
 {
-  "buildCommand": "tsc -p api/tsconfig.json",
   "functions": {
     "api/**/*": {
       "memory": 1024,
