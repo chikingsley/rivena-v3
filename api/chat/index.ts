@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     // Log import path to help debug path resolution issues
-    console.log('Handling request, imported handler from @/lib/handler');
+    console.log('Handling chat request in dedicated serverless function');
     
     const { messages, id = generateId() } = req.body
     

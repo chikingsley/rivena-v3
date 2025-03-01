@@ -4,9 +4,6 @@ import { Message } from 'ai'
 import chatApiRoutes from './chat.js'
 import { handleChatRequest } from '../src/lib/handler.js'
 
-// Get port from environment variable or use 3000 as default
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
-
 // Main chat completion endpoint
 const chatCompletionRoute = new Elysia()
   .post('/api/chat', async ({ body }) => {
@@ -22,12 +19,19 @@ const chatCompletionRoute = new Elysia()
     return result.toDataStreamResponse()
   })
 
-// Combine all routes
+// Combine all routes but don't listen - use fetch handler instead
 const app = new Elysia()
   .use(chatCompletionRoute)
   .use(chatApiRoutes)
-  .listen(PORT)
 
-console.log(`Elysia server is running at ${app.server?.hostname}:${PORT}`)
+// Export the fetch handler for serverless environments
+export default app.fetch
+
+// For local development, you can uncomment this:
+// if (process.env.NODE_ENV !== 'production') {
+//   const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000
+//   app.listen(PORT)
+//   console.log(`Elysia server is running at ${app.server?.hostname}:${PORT}`)
+// }
 
 export type App = typeof app
