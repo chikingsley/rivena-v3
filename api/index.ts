@@ -2,7 +2,7 @@
 import { Elysia } from 'elysia'
 import { Message, streamText, appendResponseMessages } from 'ai'
 import { openai } from '@ai-sdk/openai'
-import chatApiRoutes from './chat'
+import chatApiRoutes from './chat.ts'
 
 // Simple in-memory store for testing
 const chatStore: Record<string, Message[]> = {}
