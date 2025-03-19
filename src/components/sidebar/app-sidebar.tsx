@@ -1,11 +1,11 @@
 import * as React from "react"
 import { Clock, Brain, Target, Command } from "lucide-react"
 
-import { NavUser } from "./nav-user"
-import { SearchForm } from "./search-form"
-import { TimelineContent } from "./timeline-content"
-import { GoalsContent } from "./goals-content"
-import { MemoriesContent } from "./memories-content"
+import { NavUser } from "../nav-user"
+import { SearchForm } from "../search-form"
+import { TimelineContent } from "../timeline-content"
+import { GoalsContent } from "../goals-content"
+import { MemoriesContent } from "../memories-content"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenuButton, SidebarRail } from "@/components/ui/sidebar"
 
 const data = {
